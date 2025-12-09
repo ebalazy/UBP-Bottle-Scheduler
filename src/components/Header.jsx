@@ -8,9 +8,9 @@ export default function Header({ onOpenSettings }) {
                 <div className="flex items-center">
                     {/* Logo / Title */}
                     <div className="bg-blue-600 text-white p-2 rounded-lg mr-3">
-                        <span className="text-xl font-bold">L</span>
+                        <span className="text-xl font-bold">UBP</span>
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">CoPal Scheduler</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Peter's Bottle Planner</h1>
                 </div>
                 <button
                     onClick={onOpenSettings}
