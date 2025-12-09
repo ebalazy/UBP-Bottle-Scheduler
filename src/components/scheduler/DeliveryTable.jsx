@@ -1,0 +1,210 @@
+export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onDelete, specs }) {
+
+    const generateTimestamps = (shiftName, loads) => {
+        // Legacy generation kept for fallback or verifying shift distribution
+        if (!loads || loads === 0) return [];
+        let startHour = 0;
+        if (shiftName.includes('08:00-16:00')) startHour = 8;
+        else if (shiftName.includes('16:00-00:00')) startHour = 16;
+        else startHour = 0;
+        const shiftDuration = 8;
+        const interval = shiftDuration / loads;
+        const times = [];
+        for (let i = 0; i < loads; i++) {
+            const hourDecimal = startHour + (interval * i);
+            const normalized = hourDecimal % 24;
+            // Rounded to nearest hour to match main schedule
+            const hour = Math.round(normalized);
+            const safeHour = hour === 24 ? 0 : hour;
+            const hStr = safeHour.toString().padStart(2, '0');
+            const mStr = "00";
+            times.push(`${hStr}:${mStr}`);
+        }
+        return times;
+    };
+
+    const getExportData = () => {
+        if (!truckSchedule || truckSchedule.length === 0) return [];
+        return truckSchedule.map(truck => {
+            const bottleSize = specs ? specs.name : 'Unknown';
+            // Cases removed as per request
+            const pallets = specs ? specs.palletsPerTruck : 0;
+            // Determine shift based on time
+            const [h] = truck.time.split(':').map(Number);
+            let shift = 'Unknown';
+            if (h >= 0 && h < 8) shift = 'Shift 1';
+            else if (h >= 8 && h < 16) shift = 'Shift 2';
+            else shift = 'Shift 3';
+
+            return {
+                LoadID: truck.id,
+                Time: truck.time,
+                Shift: shift,
+                PO: truck.po || '',
+                BottleSize: bottleSize,
+                Pallets: pallets
+            };
+        });
+    };
+
+    const getExportFilename = (extension) => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hour = String(now.getHours()).padStart(2, '0');
+        const minute = String(now.getMinutes()).padStart(2, '0');
+        return `Schedule_Report_${year}-${month}-${day}_${hour}${minute}.${extension}`;
+    };
+
+    const triggerDownload = (content, mimeType, filename) => {
+        console.log(`Triggering download for: ${filename}`);
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        // Use direct properties for reliability
+        link.href = url;
+        link.download = filename;
+
+        // Append to body (required for Firefox/some browsers to respect download attr)
+        document.body.appendChild(link);
+
+        link.click();
+
+        // Significantly longer delay to ensure filename is captured
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            console.log(`Cleaned up download link for: ${filename}`);
+        }, 2000);
+    };
+
+    const handleExportCSV = () => {
+        const data = getExportData();
+        if (data.length === 0) return;
+
+        // CSV Header
+        const headers = ["Load ID", "Delivery Time", "Shift", "PO Number", "Bottle Size", "Pallets"];
+        // Add BOM for Excel compatibility with UTF-8
+        let csvContent = "\uFEFF" + headers.join(",") + "\n";
+
+        // CSV Rows
+        data.forEach(row => {
+            const rowStr = [
+                row.LoadID,
+                row.Time,
+                row.Shift,
+                `"${row.PO.replace(/"/g, '""')}"`, // Escape quotes
+                row.BottleSize,
+                row.Pallets
+            ].join(",");
+            csvContent += rowStr + "\n";
+        });
+
+        triggerDownload(csvContent, 'text/csv;charset=utf-8;', getExportFilename("csv"));
+    };
+
+
+
+    return (
+        <div className="space-y-6">
+
+            {/* Detailed Truck Schedule */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-indigo-100">
+                <div className="bg-indigo-600 text-white p-4 flex justify-between items-center">
+                    <h3 className="font-bold text-lg flex items-center gap-2">
+                        <span>📋 Exact Truck Schedule</span>
+                        <span className="text-xs font-normal bg-indigo-500 px-2 py-1 rounded">Auto-Generated (Rounded)</span>
+                    </h3>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleExportCSV}
+                            className="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-1 px-3 rounded shadow transition-colors flex items-center gap-1"
+                            title="Export to CSV"
+                        >
+                            <span>📄</span> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div className="p-4 bg-indigo-50">
+                    <div className="flex flex-col gap-2">
+                        {truckSchedule && truckSchedule.length > 0 ? (
+                            truckSchedule.map((truck) => (
+                                <div key={truck.id} className="bg-white px-4 py-3 rounded shadow-sm border border-indigo-100 flex flex-wrap items-center justify-between gap-4">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="bg-indigo-100 text-indigo-700 font-bold w-8 h-8 flex items-center justify-center rounded-full text-sm">
+                                            {truck.id}
+                                        </div>
+                                        <span className="text-xl font-mono text-gray-800 font-bold">{truck.time}</span>
+                                    </div>
+                                    <div className="flex items-center space-x-2 flex-grow max-w-xs">
+                                        <label className="text-xs text-gray-500 uppercase font-bold whitespace-nowrap">PO #</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter PO..."
+                                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            value={truck.po}
+                                            onChange={(e) => onUpdatePO(truck.id, e.target.value)}
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={() => onDelete(truck.id)}
+                                        className="text-red-400 hover:text-red-600 p-2 rounded hover:bg-red-50 transition-colors"
+                                        title="Remove Load"
+                                    >
+                                        🗑️
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <span className="text-gray-500 italic p-2">Enter production requirements to generate schedule.</span>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Shift Breakdown (Legacy) */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden opacity-80">
+                <h3 className="bg-gray-800 text-white p-4 font-bold text-lg">Shift Verification (Load Balancing)</h3>
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shift</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Loads Required</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Approximate Timing</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {schedule.map((shift, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r">
+                                        {shift.name}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-lg font-bold text-blue-600 border-r text-center w-32">
+                                        {shift.loads}
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">
+                                        {shift.loads > 0 ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {generateTimestamps(shift.name, shift.loads).map((time, tIdx) => (
+                                                    <span key={tIdx} className="bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-mono text-xs">
+                                                        {time}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-400 italic">No deliveries</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    );
+}
