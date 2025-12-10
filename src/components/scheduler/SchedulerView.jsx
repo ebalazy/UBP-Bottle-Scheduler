@@ -35,6 +35,7 @@ export default function SchedulerView({ state, setters, results }) {
                             <input
                                 type="number"
                                 inputMode="numeric"
+                                pattern="[0-9]*"
                                 min="0"
                                 value={state.targetDailyProduction || ''}
                                 onChange={(e) => setters.setTargetDailyProduction(e.target.value)}

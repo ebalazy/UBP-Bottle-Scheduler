@@ -39,6 +39,7 @@ export default function MRPView({ state, setters, results }) {
                                     <input
                                         type="number"
                                         inputMode="numeric"
+                                        pattern="[0-9]*"
                                         min="0"
                                         value={state.weeklyDemand[day] || ''}
                                         onChange={(e) => setters.updateDailyDemand(day, e.target.value)}
@@ -60,6 +61,7 @@ export default function MRPView({ state, setters, results }) {
                             <input
                                 type="number"
                                 inputMode="numeric"
+                                pattern="[0-9]*"
                                 min="0"
                                 value={state.currentInventoryPallets || ''}
                                 onChange={(e) => setters.setCurrentInventoryPallets(e.target.value)}
@@ -72,6 +74,7 @@ export default function MRPView({ state, setters, results }) {
                             <input
                                 type="number"
                                 inputMode="numeric"
+                                pattern="[0-9]*"
                                 min="0"
                                 value={state.incomingTrucks || ''}
                                 onChange={(e) => setters.setIncomingTrucks(e.target.value)}
