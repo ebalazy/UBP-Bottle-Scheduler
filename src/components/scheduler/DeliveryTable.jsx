@@ -57,9 +57,10 @@ export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onD
         return `Schedule_Report_${year}-${month}-${day}_${hour}${minute}.${extension}`;
     };
 
-    const triggerDownload = (content, mimeType, filename) => {
+    const triggerDownload = (content, filename) => {
         console.log(`Triggering download for: ${filename}`);
-        const blob = new Blob([content], { type: mimeType });
+        // Use standard MIME type, charset is handled by content BOM
+        const blob = new Blob([content], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
 
@@ -81,28 +82,40 @@ export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onD
     };
 
     const handleExportCSV = () => {
-        const data = getExportData();
-        if (data.length === 0) return;
+        try {
+            const data = getExportData();
+            if (!data || data.length === 0) {
+                alert("No schedule data to export. Please generate a schedule first.");
+                return;
+            }
 
-        // CSV Header
-        const headers = ["Load ID", "Delivery Time", "Shift", "PO Number", "Bottle Size", "Pallets"];
-        // Add BOM for Excel compatibility with UTF-8
-        let csvContent = "\uFEFF" + headers.join(",") + "\n";
+            // CSV Header
+            const headers = ["Load ID", "Delivery Time", "Shift", "PO Number", "Bottle Size", "Pallets"];
+            // Add BOM for Excel compatibility with UTF-8
+            let csvContent = "\uFEFF" + headers.join(",") + "\n";
 
-        // CSV Rows
-        data.forEach(row => {
-            const rowStr = [
-                row.LoadID,
-                row.Time,
-                row.Shift,
-                `"${row.PO.replace(/"/g, '""')}"`, // Escape quotes
-                row.BottleSize,
-                row.Pallets
-            ].join(",");
-            csvContent += rowStr + "\n";
-        });
+            // CSV Rows
+            data.forEach(row => {
+                // Robust string conversion to prevent errors
+                const po = String(row.PO || '').replace(/"/g, '""');
+                const rowStr = [
+                    row.LoadID,
+                    row.Time,
+                    row.Shift,
+                    `"${po}"`,
+                    row.BottleSize,
+                    row.Pallets
+                ].join(",");
+                csvContent += rowStr + "\n";
+            });
 
-        triggerDownload(csvContent, 'text/csv;charset=utf-8;', getExportFilename("csv"));
+            const filename = getExportFilename("csv");
+            console.log(`Exporting ${data.length} rows to ${filename}`);
+            triggerDownload(csvContent, filename);
+        } catch (error) {
+            console.error("Export failed:", error);
+            alert(`Export failed: ${error.message}`);
+        }
     };
 
 
