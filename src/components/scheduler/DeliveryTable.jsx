@@ -1,3 +1,5 @@
+import { saveAs } from 'file-saver';
+
 export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onDelete, specs }) {
 
     const generateTimestamps = (shiftName, loads) => {
@@ -57,29 +59,7 @@ export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onD
         return `Schedule_Report_${year}-${month}-${day}_${hour}${minute}.${extension}`;
     };
 
-    const triggerDownload = (content, filename) => {
-        console.log(`Triggering download for: ${filename}`);
-        // Use standard MIME type, charset is handled by content BOM
-        const blob = new Blob([content], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
 
-        // Use direct properties for reliability
-        link.href = url;
-        link.download = filename;
-
-        // Append to body (required for Firefox/some browsers to respect download attr)
-        document.body.appendChild(link);
-
-        link.click();
-
-        // Significantly longer delay to ensure filename is captured
-        setTimeout(() => {
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-            console.log(`Cleaned up download link for: ${filename}`);
-        }, 2000);
-    };
 
     const handleExportCSV = () => {
         try {
@@ -111,7 +91,11 @@ export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onD
 
             const filename = getExportFilename("csv");
             console.log(`Exporting ${data.length} rows to ${filename}`);
-            triggerDownload(csvContent, filename);
+
+            // Use file-saver for robust cross-browser saving
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+            saveAs(blob, filename);
+
         } catch (error) {
             console.error("Export failed:", error);
             alert(`Export failed: ${error.message}`);
