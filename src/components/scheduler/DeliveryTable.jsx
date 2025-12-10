@@ -139,12 +139,12 @@ export default function DeliveryTable({ schedule, truckSchedule, onUpdatePO, onD
                                         </div>
                                         <span className="text-xl font-mono text-gray-800 font-bold">{truck.time}</span>
                                     </div>
-                                    <div className="flex items-center space-x-2 flex-grow max-w-xs">
+                                    <div className="flex items-center space-x-2 flex-grow w-full sm:max-w-xs">
                                         <label className="text-xs text-gray-500 uppercase font-bold whitespace-nowrap">PO #</label>
                                         <input
                                             type="text"
                                             placeholder="Enter PO..."
-                                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm"
                                             value={truck.po}
                                             onChange={(e) => onUpdatePO(truck.id, e.target.value)}
                                         />

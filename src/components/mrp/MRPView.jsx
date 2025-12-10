@@ -43,7 +43,7 @@ export default function MRPView({ state, setters, results }) {
                                         min="0"
                                         value={state.weeklyDemand[day] || ''}
                                         onChange={(e) => setters.updateDailyDemand(day, e.target.value)}
-                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-1"
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base py-1"
                                         placeholder="0"
                                     />
                                 </div>

@@ -35,7 +35,7 @@ export default function SettingsModal({ onClose }) {
                             pattern="[0-9]*"
                             value={safetyStockLoads}
                             onChange={(e) => setSafetyStockLoads(Number(e.target.value))}
-                            className="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-lg"
+                            className="mt-1 block w-24 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-lg"
                         />
                         <p className="text-xs text-blue-700 mt-1">
                             Minimum inventory to hold in terms of Full Truck Loads.
@@ -60,7 +60,7 @@ export default function SettingsModal({ onClose }) {
                                                 pattern="[0-9]*"
                                                 value={bottleDefinitions[size].bottlesPerCase}
                                                 onChange={(e) => updateBottleDefinition(size, 'bottlesPerCase', e.target.value)}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm"
                                             />
                                         </div>
                                         <div>
@@ -71,7 +71,7 @@ export default function SettingsModal({ onClose }) {
                                                 pattern="[0-9]*"
                                                 value={bottleDefinitions[size].bottlesPerTruck}
                                                 onChange={(e) => updateBottleDefinition(size, 'bottlesPerTruck', e.target.value)}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm"
                                             />
                                         </div>
                                         <div>
@@ -82,7 +82,7 @@ export default function SettingsModal({ onClose }) {
                                                 pattern="[0-9]*"
                                                 value={bottleDefinitions[size].casesPerTruck}
                                                 onChange={(e) => updateBottleDefinition(size, 'casesPerTruck', e.target.value)}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm"
                                             />
                                         </div>
                                         <div>
@@ -93,7 +93,7 @@ export default function SettingsModal({ onClose }) {
                                                 pattern="[0-9]*"
                                                 value={bottleDefinitions[size].casesPerPallet || 0}
                                                 onChange={(e) => updateBottleDefinition(size, 'casesPerPallet', e.target.value)}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm"
                                             />
                                         </div>
                                     </div>
