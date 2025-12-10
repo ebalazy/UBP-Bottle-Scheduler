@@ -34,6 +34,7 @@ export default function SchedulerView({ state, setters, results }) {
                         <div className="relative rounded-md shadow-sm">
                             <input
                                 type="number"
+                                inputMode="numeric"
                                 min="0"
                                 value={state.targetDailyProduction || ''}
                                 onChange={(e) => setters.setTargetDailyProduction(e.target.value)}

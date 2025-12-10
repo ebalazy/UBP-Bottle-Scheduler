@@ -38,6 +38,7 @@ export default function MRPView({ state, setters, results }) {
                                     <label className="block text-xs text-gray-500 uppercase font-bold mb-1">{day}</label>
                                     <input
                                         type="number"
+                                        inputMode="numeric"
                                         min="0"
                                         value={state.weeklyDemand[day] || ''}
                                         onChange={(e) => setters.updateDailyDemand(day, e.target.value)}
@@ -58,6 +59,7 @@ export default function MRPView({ state, setters, results }) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Floor Inventory (Pallets)</label>
                             <input
                                 type="number"
+                                inputMode="numeric"
                                 min="0"
                                 value={state.currentInventoryPallets || ''}
                                 onChange={(e) => setters.setCurrentInventoryPallets(e.target.value)}
@@ -69,6 +71,7 @@ export default function MRPView({ state, setters, results }) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Incoming Trucks</label>
                             <input
                                 type="number"
+                                inputMode="numeric"
                                 min="0"
                                 value={state.incomingTrucks || ''}
                                 onChange={(e) => setters.setIncomingTrucks(e.target.value)}
